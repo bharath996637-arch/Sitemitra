@@ -1,0 +1,8 @@
+{
+  "name": "SiteMitra",
+  "description": "Find Work. Find Workers. Build Together. Construction employment marketplace connecting workers, supervisors, and contractors.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
