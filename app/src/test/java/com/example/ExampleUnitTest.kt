@@ -54,4 +54,12 @@ class ExampleUnitTest {
         assertEquals("9845078210", sanitized)
         assertEquals(10, sanitized.length)
     }
+
+    @Test
+    fun testGoogleServerEndpoint() {
+        val serverUrl = com.example.data.remote.SiteMitraServerConfig.GOOGLE_SERVER_WEB_URL
+        assertEquals("https://ais-pre-teslros233v7olr72hky2x-119054699939.asia-northeast1.run.app", serverUrl)
+        assertTrue(serverUrl.startsWith("https://"))
+        assertEquals("Google Cloud Run (asia-northeast1)", com.example.data.remote.SiteMitraServerConfig.SERVER_REGION)
+    }
 }

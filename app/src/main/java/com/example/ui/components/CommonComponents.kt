@@ -99,6 +99,22 @@ object ExternalActionHelper {
             Toast.makeText(context, "Opening location for $siteName", Toast.LENGTH_SHORT).show()
         }
     }
+
+    fun shareAppLink(context: Context, appUrl: String = "https://ais-pre-teslros233v7olr72hky2x-119054699939.asia-northeast1.run.app") {
+        try {
+            val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                type = "text/plain"
+                putExtra(Intent.EXTRA_SUBJECT, "Test SiteMitra - Construction Marketplace App")
+                putExtra(
+                    Intent.EXTRA_TEXT,
+                    "🏗️ Join me on SiteMitra – Construction Employment Marketplace (Bengaluru)!\nFind genuine construction work, hire verified workers & track daily attendance.\n\n👉 Test the app live here:\n$appUrl"
+                )
+            }
+            context.startActivity(Intent.createChooser(shareIntent, "Share SiteMitra App Link"))
+        } catch (e: Exception) {
+            Toast.makeText(context, "Cannot open share sheet", Toast.LENGTH_SHORT).show()
+        }
+    }
 }
 
 @Composable
@@ -106,7 +122,10 @@ fun SiteMitraTopBar(
     role: UserRole,
     language: Language,
     onRoleClick: () -> Unit,
-    onLanguageClick: () -> Unit
+    onLanguageClick: () -> Unit,
+    serverIsConnected: Boolean = true,
+    serverLatencyMs: Long? = 48L,
+    onServerClick: (() -> Unit)? = null
 ) {
     Surface(
         color = MaterialTheme.colorScheme.surface,
@@ -116,7 +135,7 @@ fun SiteMitraTopBar(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 10.dp),
+                .padding(horizontal = 14.dp, vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
@@ -127,34 +146,34 @@ fun SiteMitraTopBar(
             ) {
                 Box(
                     modifier = Modifier
-                        .size(38.dp)
+                        .size(36.dp)
                         .clip(RoundedCornerShape(8.dp))
                         .background(NavyPrimary),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
                         text = "🏗️",
-                        fontSize = 20.sp
+                        fontSize = 18.sp
                     )
                 }
-                Spacer(modifier = Modifier.width(10.dp))
+                Spacer(modifier = Modifier.width(8.dp))
                 Column {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
                             text = "SiteMitra",
                             fontWeight = FontWeight.Bold,
-                            fontSize = 19.sp,
+                            fontSize = 18.sp,
                             color = NavyPrimary
                         )
-                        Spacer(modifier = Modifier.width(6.dp))
+                        Spacer(modifier = Modifier.width(4.dp))
                         Box(
                             modifier = Modifier
                                 .clip(RoundedCornerShape(4.dp))
                                 .background(AmberSafetyContainer)
-                                .padding(horizontal = 6.dp, vertical = 2.dp)
+                                .padding(horizontal = 5.dp, vertical = 2.dp)
                         ) {
                             Text(
-                                text = "BENGALURU",
+                                text = "BLR",
                                 fontSize = 9.sp,
                                 fontWeight = FontWeight.ExtraBold,
                                 color = AmberSafety
@@ -171,8 +190,19 @@ fun SiteMitraTopBar(
                 }
             }
 
-            // Quick Role Switcher Chip & Language Chip
-            Row(verticalAlignment = Alignment.CenterVertically) {
+            // Server Status Chip, Role Switcher Chip & Language Chip
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(6.dp)
+            ) {
+                if (onServerClick != null) {
+                    ServerStatusChip(
+                        isConnected = serverIsConnected,
+                        latencyMs = serverLatencyMs,
+                        onClick = onServerClick
+                    )
+                }
+
                 Surface(
                     shape = RoundedCornerShape(20.dp),
                     color = MaterialTheme.colorScheme.primaryContainer,
@@ -181,17 +211,17 @@ fun SiteMitraTopBar(
                         .clickable { onRoleClick() }
                 ) {
                     Row(
-                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 5.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
                             text = role.badge,
-                            fontSize = 14.sp
+                            fontSize = 13.sp
                         )
-                        Spacer(modifier = Modifier.width(4.dp))
+                        Spacer(modifier = Modifier.width(3.dp))
                         Text(
                             text = role.displayName.split(" ").first(),
-                            fontSize = 12.sp,
+                            fontSize = 11.sp,
                             fontWeight = FontWeight.SemiBold,
                             color = MaterialTheme.colorScheme.onPrimaryContainer
                         )
@@ -199,25 +229,23 @@ fun SiteMitraTopBar(
                         Icon(
                             Icons.Default.SwapHoriz,
                             contentDescription = "Switch",
-                            modifier = Modifier.size(14.dp),
+                            modifier = Modifier.size(13.dp),
                             tint = MaterialTheme.colorScheme.onPrimaryContainer
                         )
                     }
                 }
 
-                Spacer(modifier = Modifier.width(6.dp))
-
                 IconButton(
                     onClick = onLanguageClick,
                     modifier = Modifier
-                        .size(36.dp)
+                        .size(34.dp)
                         .testTag("language_selector_btn")
                 ) {
                     Icon(
                         Icons.Default.Language,
                         contentDescription = "Language",
                         tint = NavyPrimary,
-                        modifier = Modifier.size(20.dp)
+                        modifier = Modifier.size(18.dp)
                     )
                 }
             }

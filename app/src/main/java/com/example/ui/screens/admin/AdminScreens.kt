@@ -18,11 +18,17 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.CloudDone
 import androidx.compose.material.icons.filled.Flag
 import androidx.compose.material.icons.filled.Gavel
 import androidx.compose.material.icons.filled.Map
+import androidx.compose.material.icons.filled.OpenInBrowser
 import androidx.compose.material.icons.filled.Security
+import androidx.compose.material.icons.filled.Sync
 import androidx.compose.material.icons.filled.Verified
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontFamily
+import com.example.data.remote.SiteMitraServerConfig
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -31,6 +37,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
@@ -65,6 +72,9 @@ fun AdminDashboardScreen(
     val jobs by viewModel.allJobs.collectAsState()
     val sites by viewModel.allSites.collectAsState()
     val reports by viewModel.allReports.collectAsState()
+    val serverIsConnected by viewModel.serverIsConnected.collectAsState()
+    val serverLatencyMs by viewModel.serverLatencyMs.collectAsState()
+    val context = LocalContext.current
     var selectedTab by remember { mutableIntStateOf(0) }
 
     Column(
@@ -115,6 +125,92 @@ fun AdminDashboardScreen(
                             }
                             Spacer(modifier = Modifier.height(4.dp))
                             Text(text = "Pilot Phase: Bengaluru • 90-Day Marketplace Targets", fontSize = 12.sp, color = Color(0xFF94A3B8))
+                        }
+                    }
+                }
+
+                // Google Cloud Infrastructure Status Card
+                item {
+                    Card(
+                        shape = RoundedCornerShape(12.dp),
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Column(modifier = Modifier.padding(14.dp)) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(
+                                        Icons.Default.CloudDone,
+                                        contentDescription = null,
+                                        tint = if (serverIsConnected) GreenSuccess else AmberSafety,
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text(
+                                        text = "Google Cloud Server (Run)",
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 13.sp,
+                                        color = NavyPrimary
+                                    )
+                                }
+
+                                Surface(
+                                    shape = RoundedCornerShape(12.dp),
+                                    color = if (serverIsConnected) GreenSuccess.copy(alpha = 0.15f) else AmberSafety.copy(alpha = 0.15f)
+                                ) {
+                                    Text(
+                                        text = if (serverLatencyMs != null) "${serverLatencyMs}ms ONLINE" else "ONLINE",
+                                        fontSize = 10.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = if (serverIsConnected) GreenSuccess else AmberSafety,
+                                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)
+                                    )
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.height(6.dp))
+
+                            Text(
+                                text = SiteMitraServerConfig.GOOGLE_SERVER_WEB_URL,
+                                fontSize = 10.sp,
+                                fontFamily = FontFamily.Monospace,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+
+                            Spacer(modifier = Modifier.height(10.dp))
+
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                OutlinedButton(
+                                    onClick = { viewModel.pingGoogleServer() },
+                                    shape = RoundedCornerShape(8.dp),
+                                    modifier = Modifier.weight(1f)
+                                ) {
+                                    Icon(Icons.Default.Sync, contentDescription = null, modifier = Modifier.size(14.dp))
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Text("Ping Server", fontSize = 11.sp)
+                                }
+
+                                Button(
+                                    onClick = {
+                                        SiteMitraServerConfig.openWebPortal(context)
+                                    },
+                                    colors = ButtonDefaults.buttonColors(containerColor = AmberSafety),
+                                    shape = RoundedCornerShape(8.dp),
+                                    modifier = Modifier.weight(1.5f)
+                                ) {
+                                    Icon(Icons.Default.OpenInBrowser, contentDescription = null, modifier = Modifier.size(14.dp))
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Text("Open Web Portal", fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                                }
+                            }
                         }
                     }
                 }

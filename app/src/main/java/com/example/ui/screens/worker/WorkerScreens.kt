@@ -38,8 +38,10 @@ import androidx.compose.material.icons.filled.ElectricBolt
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Verified
+import com.example.ui.components.ExternalActionHelper
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.OutlinedButton
@@ -906,6 +908,7 @@ fun WorkerProfileScreen(
 ) {
     val user by viewModel.currentWorkerUser.collectAsState()
     val language by viewModel.currentLanguage.collectAsState()
+    val context = LocalContext.current
 
     Column(
         modifier = modifier
@@ -1077,6 +1080,22 @@ fun WorkerProfileScreen(
                     }
                 }
             }
+        }
+
+        // Share App Testing Link with Friends (WhatsApp/SMS)
+        Button(
+            onClick = {
+                ExternalActionHelper.shareAppLink(context)
+            },
+            colors = ButtonDefaults.buttonColors(containerColor = AmberSafety),
+            shape = RoundedCornerShape(10.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .testTag("share_app_friends_button")
+        ) {
+            Icon(Icons.Default.Share, contentDescription = null, modifier = Modifier.size(18.dp))
+            Spacer(modifier = Modifier.width(8.dp))
+            Text("Share App with Friends to Test (WhatsApp)", fontWeight = FontWeight.Bold)
         }
 
         // Language & Switch Profile

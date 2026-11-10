@@ -51,6 +51,7 @@ import com.example.data.model.UserRole
 import com.example.ui.components.LanguagePickerSheet
 import com.example.ui.components.LiveConstructionMap
 import com.example.ui.components.RolePickerSheet
+import com.example.ui.components.ServerStatusDialog
 import com.example.ui.components.SiteMitraTopBar
 import com.example.ui.screens.auth.MobileLoginScreen
 import com.example.ui.screens.admin.AdminDashboardScreen
@@ -87,6 +88,12 @@ class MainActivity : ComponentActivity() {
                 val showLanguagePicker by viewModel.showLanguagePicker.collectAsState()
                 val currentLanguage by viewModel.currentLanguage.collectAsState()
                 val userMessage by viewModel.userMessage.collectAsState()
+                val showServerDialog by viewModel.showServerDialog.collectAsState()
+                val serverIsConnected by viewModel.serverIsConnected.collectAsState()
+                val serverLatencyMs by viewModel.serverLatencyMs.collectAsState()
+                val serverStatusMessage by viewModel.serverStatusMessage.collectAsState()
+                val lastSyncTime by viewModel.lastSyncTime.collectAsState()
+                val isPingingServer by viewModel.isPingingServer.collectAsState()
                 val snackbarHostState = remember { SnackbarHostState() }
 
                 LaunchedEffect(userMessage) {
@@ -115,6 +122,19 @@ class MainActivity : ComponentActivity() {
                             onDismiss = { viewModel.setShowLanguagePicker(false) }
                         )
                     }
+
+                    if (showServerDialog) {
+                        ServerStatusDialog(
+                            isConnected = serverIsConnected,
+                            latencyMs = serverLatencyMs,
+                            statusMessage = serverStatusMessage,
+                            lastSyncTime = lastSyncTime,
+                            isPinging = isPingingServer,
+                            onPingClick = { viewModel.pingGoogleServer() },
+                            onSyncClick = { viewModel.syncWithGoogleServer() },
+                            onDismiss = { viewModel.setShowServerDialog(false) }
+                        )
+                    }
                 }
             }
         }
@@ -131,9 +151,10 @@ fun SiteMitraApp(viewModel: SiteMitraViewModel) {
     val adminTab by viewModel.adminTab.collectAsState()
 
     val showRolePicker by viewModel.showRolePicker.collectAsState()
-    val showLanguagePicker by viewModel.showLanguagePicker.collectAsState()
     val showPostJobDialog by viewModel.showPostJobDialog.collectAsState()
     val userMessage by viewModel.userMessage.collectAsState()
+    val serverIsConnected by viewModel.serverIsConnected.collectAsState()
+    val serverLatencyMs by viewModel.serverLatencyMs.collectAsState()
 
     val sites by viewModel.allSites.collectAsState()
     val selectedSite by viewModel.selectedSite.collectAsState()
@@ -151,7 +172,10 @@ fun SiteMitraApp(viewModel: SiteMitraViewModel) {
                 role = currentRole,
                 language = currentLanguage,
                 onRoleClick = { viewModel.setShowRolePicker(true) },
-                onLanguageClick = { viewModel.setShowLanguagePicker(true) }
+                onLanguageClick = { viewModel.setShowLanguagePicker(true) },
+                serverIsConnected = serverIsConnected,
+                serverLatencyMs = serverLatencyMs,
+                onServerClick = { viewModel.setShowServerDialog(true) }
             )
         },
         bottomBar = {

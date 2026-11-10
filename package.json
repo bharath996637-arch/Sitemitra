@@ -1,0 +1,13 @@
+{
+  "name": "sitemitra",
+  "version": "1.0.0",
+  "description": "SiteMitra - Construction Employment Marketplace (Android & Web)",
+  "main": "index.html",
+  "scripts": {
+    "build": "echo 'Build successful for Vercel'",
+    "start": "npx serve ."
+  },
+  "keywords": ["construction", "jobs", "marketplace", "bengaluru", "sitemitra"],
+  "author": "Bharath",
+  "license": "ISC"
+}

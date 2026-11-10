@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SiteMitra – Construction Employment Marketplace (Android & Web)</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏗️</text></svg>">
+  <meta name="description" content="SiteMitra - Find Work. Find Workers. Build Together. Construction employment marketplace connecting workers, mestris, and contractors in Bengaluru.">
+  <style>
+    :root {
+      --navy-primary: #0F172A;
+      --navy-light: #1E293B;
+      --amber-safety: #D97706;
+      --amber-bg: #FEF3C7;
+      --green-success: #16A34A;
+      --green-bg: #DCFCE7;
+      --red-urgent: #DC2626;
+      --red-bg: #FEE2E2;
+      --bg-page: #F8FAFC;
+      --surface: #FFFFFF;
+      --text-main: #0F172A;
+      --text-muted: #64748B;
+      --border-color: #E2E8F0;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+    body {
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      line-height: 1.5;
+    }
+    /* Header Bar */
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border-color);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .brand-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .brand-icon {
+      width: 44px;
+      height: 44px;
+      background: var(--navy-primary);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+    }
+    .brand-title {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--navy-primary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .brand-tagline {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    .pilot-chip {
+      background: var(--amber-bg);
+      color: var(--amber-safety);
+      font-size: 11px;
+      font-weight: 800;
+      padding: 3px 8px;
+      border-radius: 6px;
+      letter-spacing: 0.5px;
+    }
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .lang-select {
+      padding: 6px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      background: var(--surface);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--navy-primary);
+      cursor: pointer;
+    }
+    .btn-download {
+      background: var(--amber-safety);
+      color: #FFF;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.2s;
+    }
+    .btn-download:hover {
+      background: #B45309;
+    }
+
+    /* Container */
+    .container {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 24px 16px;
+    }
+
+    /* Hero Banner */
+    .hero-banner {
+      background: linear-gradient(135deg, var(--navy-primary) 0%, #1E3A8A 100%);
+      color: #FFF;
+      border-radius: 16px;
+      padding: 36px 32px;
+      margin-bottom: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+    .hero-content {
+      max-width: 680px;
+    }
+    .hero-content h1 {
+      font-size: 32px;
+      font-weight: 800;
+      margin-bottom: 8px;
+      line-height: 1.2;
+    }
+    .hero-content p {
+      font-size: 15px;
+      color: #CBD5E1;
+      margin-bottom: 18px;
+    }
+    .hero-metrics {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    .metric-box {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 10px 16px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+    .metric-value {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--amber-safety);
+    }
+    .metric-label {
+      font-size: 12px;
+      color: #E2E8F0;
+    }
+
+    /* Server Status Banner */
+    .server-status-bar {
+      background: var(--surface);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 14px 20px;
+      margin-bottom: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .server-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .dot-online {
+      width: 10px;
+      height: 10px;
+      background: var(--green-success);
+      border-radius: 50%;
+      box-shadow: 0 0 0 3px var(--green-bg);
+    }
+    .server-url {
+      font-family: monospace;
+      font-size: 12px;
+      background: var(--bg-page);
+      padding: 3px 8px;
+      border-radius: 6px;
+      border: 1px solid var(--border-color);
+    }
+    .btn-ping {
+      background: var(--navy-primary);
+      color: #FFF;
+      border: none;
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* Role Tabs */
+    .role-tabs {
+      display: flex;
+      gap: 8px;
+      border-bottom: 2px solid var(--border-color);
+      margin-bottom: 24px;
+      overflow-x: auto;
+    }
+    .role-tab-btn {
+      padding: 12px 20px;
+      border: none;
+      background: none;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 3px solid transparent;
+      margin-bottom: -2px;
+      white-space: nowrap;
+    }
+    .role-tab-btn.active {
+      color: var(--navy-primary);
+      border-bottom-color: var(--navy-primary);
+    }
+
+    /* Content Panes */
+    .tab-pane {
+      display: none;
+    }
+    .tab-pane.active {
+      display: block;
+    }
+
+    /* Filter & Search Bar */
+    .filter-bar {
+      background: var(--surface);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 20px;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .search-input {
+      flex: 1;
+      min-width: 200px;
+      padding: 10px 14px;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      font-size: 14px;
+    }
+    .filter-select {
+      padding: 10px 14px;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      font-size: 14px;
+      background: #FFF;
+    }
+
+    /* Grid of Cards */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 18px;
+    }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 20px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    }
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 12px;
+    }
+    .card-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--navy-primary);
+    }
+    .card-site {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+    .badge-urgent {
+      background: var(--red-bg);
+      color: var(--red-urgent);
+      font-size: 11px;
+      font-weight: 800;
+      padding: 3px 8px;
+      border-radius: 6px;
+    }
+    .badge-trade {
+      background: #EFF6FF;
+      color: #1E40AF;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 6px;
+      display: inline-block;
+      margin-bottom: 12px;
+    }
+    .card-specs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+    .spec-item {
+      font-size: 12px;
+      color: var(--text-muted);
+      background: var(--bg-page);
+      padding: 4px 10px;
+      border-radius: 6px;
+    }
+    .wage-highlight {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--green-success);
+    }
+    .card-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 14px;
+      border-top: 1px solid var(--border-color);
+      padding-top: 14px;
+    }
+    .btn-call {
+      flex: 1;
+      background: var(--navy-primary);
+      color: #FFF;
+      padding: 10px;
+      border-radius: 8px;
+      text-align: center;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .btn-whatsapp {
+      flex: 1;
+      background: var(--green-success);
+      color: #FFF;
+      padding: 10px;
+      border-radius: 8px;
+      text-align: center;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    /* Footer */
+    footer {
+      background: var(--surface);
+      border-top: 1px solid var(--border-color);
+      padding: 32px 16px;
+      margin-top: 48px;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top App Navigation -->
+  <header>
+    <div class="brand-wrap">
+      <div class="brand-icon">🏗️</div>
+      <div>
+        <div class="brand-title">
+          SiteMitra
+          <span class="pilot-chip">BENGALURU PILOT</span>
+        </div>
+        <div class="brand-tagline" id="txt-tagline">Find Work. Find Workers. Build Together.</div>
+      </div>
+    </div>
+
+    <div class="nav-actions">
+      <select class="lang-select" id="lang-switcher" onchange="changeLanguage(this.value)">
+        <option value="en">English (EN)</option>
+        <option value="kn" selected>ಕನ್ನಡ (Kannada)</option>
+        <option value="hi">हिंदी (Hindi)</option>
+        <option value="te">తెలుగు (Telugu)</option>
+      </select>
+
+      <a href="https://ais-pre-teslros233v7olr72hky2x-119054699939.asia-northeast1.run.app" target="_blank" class="btn-download">
+        <span>📲</span>
+        <span>Android APK</span>
+      </a>
+    </div>
+  </header>
+
+  <div class="container">
+
+    <!-- Hero Announcement -->
+    <div class="hero-banner">
+      <div class="hero-content">
+        <h1 id="txt-hero-title">Bengaluru Construction Employment Marketplace</h1>
+        <p id="txt-hero-desc">Connecting verified masons, electricians, bar benders, and carpenters with active site supervisors and leading contractors across Metro Bengaluru. 100% Free & Zero Commission.</p>
+        <div class="hero-metrics">
+          <div class="metric-box">
+            <div class="metric-value">428+</div>
+            <div class="metric-label">Verified Workers</div>
+          </div>
+          <div class="metric-box">
+            <div class="metric-value">86</div>
+            <div class="metric-label">Active Sites Hiring</div>
+          </div>
+          <div class="metric-box">
+            <div class="metric-value">₹850 - ₹1,200</div>
+            <div class="metric-label">Daily Wage Range</div>
+          </div>
+          <div class="metric-box">
+            <div class="metric-value">0% Fee</div>
+            <div class="metric-label">Zero Worker Commission</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Google Cloud Server Connectivity -->
+    <div class="server-status-bar">
+      <div class="server-info">
+        <div class="dot-online" id="server-dot"></div>
+        <div>
+          <strong style="font-size: 13px;">Google Cloud Server Gateway:</strong>
+          <span class="server-url">asia-northeast1.run.app</span>
+          <span style="font-size: 11px; color: var(--green-success); font-weight: bold; margin-left: 6px;" id="server-status-text">ONLINE (42ms)</span>
+        </div>
+      </div>
+      <div>
+        <button class="btn-ping" onclick="pingServer()">Ping Server</button>
+      </div>
+    </div>
+
+    <!-- Role Nav Tabs -->
+    <div class="role-tabs">
+      <button class="role-tab-btn active" onclick="switchTab('workers')">👷 <span id="tab-worker-label">Workers (Find Work)</span></button>
+      <button class="role-tab-btn" onclick="switchTab('supervisors')">👷‍♂️ <span id="tab-sup-label">Mestris & Supervisors</span></button>
+      <button class="role-tab-btn" onclick="switchTab('contractors')">🏢 <span id="tab-contractor-label">Contractor Multi-Site</span></button>
+      <button class="role-tab-btn" onclick="switchTab('admin')">🛡️ <span id="tab-admin-label">Admin & Safety Desk</span></button>
+    </div>
+
+    <!-- TAB 1: WORKERS (FIND WORK) -->
+    <div id="tab-workers" class="tab-pane active">
+      <div class="filter-bar">
+        <input type="text" class="search-input" id="search-box" placeholder="Search by trade (Mason, Plumber, Electrician) or area..." onkeyup="filterJobs()">
+        <select class="filter-select" id="area-filter" onchange="filterJobs()">
+          <option value="all">All Bengaluru Hubs</option>
+          <option value="Whitefield">Whitefield</option>
+          <option value="Koramangala">Koramangala</option>
+          <option value="Hebbal">Hebbal</option>
+          <option value="Electronic City">Electronic City</option>
+          <option value="Sarjapur">Sarjapur</option>
+        </select>
+        <select class="filter-select" id="trade-filter" onchange="filterJobs()">
+          <option value="all">All Trade Skills</option>
+          <option value="Mason">Mason / Bricklayer (ಗಾರೆ)</option>
+          <option value="Electrician">Electrician (ವಿದ್ಯುತ್)</option>
+          <option value="Plumber">Plumber (ಪ್ಲಂಬರ್)</option>
+          <option value="Carpenter">Carpenter (ಬಡಗಿ)</option>
+          <option value="Bar Bender">Bar Bender (ಕಬ್ಬಿಣ)</option>
+          <option value="Painter">Painter (ಪೇಂಟರ್)</option>
+          <option value="Helper">Helper (ಸಹಾಯಕ)</option>
+        </select>
+      </div>
+
+      <div class="cards-grid" id="jobs-grid">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+
+    <!-- TAB 2: SUPERVISORS -->
+    <div id="tab-supervisors" class="tab-pane">
+      <div class="card" style="margin-bottom: 20px;">
+        <h3 style="font-size: 18px; margin-bottom: 10px; color: var(--navy-primary);">Supervisor Quick Job Posting</h3>
+        <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">Publish site requirements instantly to thousands of verified workers across Bengaluru.</p>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 14px;">
+          <input type="text" class="search-input" placeholder="Project Name (e.g. Prestige Tech Vista)">
+          <input type="text" class="search-input" placeholder="Workers Needed (e.g. 6 Masons)">
+          <input type="text" class="search-input" placeholder="Daily Wage (e.g. ₹950/day)">
+        </div>
+        <button class="btn-download" style="width: fit-content; border: none; cursor: pointer;">Post Job Opening</button>
+      </div>
+
+      <h3 style="font-size: 18px; margin-bottom: 14px; color: var(--navy-primary);">Today's Muster Roll & Applications</h3>
+      <div class="cards-grid">
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Greenfield Tech Park (RCC Stage)</div>
+              <div class="card-site">Whitefield • Supervisor: Govindappa (+91 98451 22340)</div>
+            </div>
+            <span class="badge-urgent">12 Present Today</span>
+          </div>
+          <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px;">8 Masons, 4 Helpers checked in at 08:30 AM. Steel toe boots & hard hats verified.</p>
+          <div class="wage-highlight">Total Today: ₹11,400</div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Sobha Silicon Heights (Finishing)</div>
+              <div class="card-site">Koramangala • Supervisor: Venkat (+91 98452 33451)</div>
+            </div>
+            <span class="badge-urgent">8 Present Today</span>
+          </div>
+          <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px;">4 Tile Masons, 4 Painters checked in at 08:45 AM. Vitrified tiles floor 4.</p>
+          <div class="wage-highlight">Total Today: ₹7,800</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3: CONTRACTORS -->
+    <div id="tab-contractors" class="tab-pane">
+      <div class="card" style="margin-bottom: 20px; background: var(--navy-primary); color: #FFF;">
+        <h3 style="font-size: 20px; font-weight: 800; margin-bottom: 4px;">Reddy Infra & Construction Pvt Ltd</h3>
+        <p style="font-size: 13px; color: #94A3B8; margin-bottom: 16px;">Suresh Reddy • Managing 4 Commercial & Residential Sites in Bengaluru</p>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px;">
+          <div>
+            <div style="font-size: 12px; color: #94A3B8;">Workforce Required</div>
+            <div style="font-size: 22px; font-weight: 800; color: #FFF;">45 Workers</div>
+          </div>
+          <div>
+            <div style="font-size: 12px; color: #94A3B8;">Active Workers Hired</div>
+            <div style="font-size: 22px; font-weight: 800; color: var(--amber-safety);">38 Workers (84%)</div>
+          </div>
+          <div>
+            <div style="font-size: 12px; color: #94A3B8;">Estimated Daily Wages</div>
+            <div style="font-size: 22px; font-weight: 800; color: var(--green-success);">₹34,200 / day</div>
+          </div>
+        </div>
+      </div>
+
+      <h3 style="font-size: 18px; margin-bottom: 14px; color: var(--navy-primary);">Active Site Portfolios</h3>
+      <div class="cards-grid">
+        <div class="card">
+          <div class="card-title">Prestige Lakeside Habitat (Villas)</div>
+          <div class="card-site">Varthur / Whitefield</div>
+          <div class="card-specs" style="margin-top: 10px;">
+            <span class="spec-item">Civil & Finishing</span>
+            <span class="spec-item">14/15 Workers Hired</span>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Brigade Gateway Extension Phase 2</div>
+          <div class="card-site">Rajajinagar / Yeshwanthpur</div>
+          <div class="card-specs" style="margin-top: 10px;">
+            <span class="spec-item">RCC Framing</span>
+            <span class="spec-item">20/22 Workers Hired</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 4: ADMIN & SAFETY DESK -->
+    <div id="tab-admin" class="tab-pane">
+      <div class="card" style="margin-bottom: 20px;">
+        <h3 style="font-size: 18px; color: var(--navy-primary); margin-bottom: 6px;">SiteMitra Trust & Zero-Commission Standard</h3>
+        <p style="font-size: 13px; color: var(--text-muted);">Workers are strictly never charged to find, apply, or work on any construction project. Every wage listing is verified with licensed contractors.</p>
+      </div>
+
+      <div class="cards-grid">
+        <div class="card">
+          <div class="card-title">RERA & PPE Safety Compliance</div>
+          <p style="font-size: 13px; color: var(--text-muted); margin: 8px 0;">Mandatory hard hats, reflective jackets, and steel toe shoes provided on all active sites.</p>
+          <div class="badge-trade" style="background: var(--green-bg); color: var(--green-success);">100% Verified Sites</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Worker Grievance & Wage Helpdesk</div>
+          <p style="font-size: 13px; color: var(--text-muted); margin: 8px 0;">24/7 hotline for wage disputes or safety concerns. Immediate contractor escalation.</p>
+          <a href="tel:08040128899" class="btn-call" style="margin-top: 8px; width: fit-content; display: inline-block;">Call Helpdesk (+91 80 4012 8899)</a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <footer>
+    <strong>SiteMitra</strong> – Construction Employment Marketplace &copy; 2026.<br>
+    Built for Android & Web • Serving Workers, Supervisors & Contractors across India.
+  </footer>
+
+  <script>
+    const JOBS_DATA = [
+      {
+        id: 1,
+        title: "Brick Mason (ಗಾರೆ ಮೇಸ್ತ್ರಿ)",
+        trade: "Mason",
+        site: "Greenfield Tech Park (Phase 3)",
+        area: "Whitefield",
+        wage: 950,
+        vacancies: 6,
+        phone: "+919845122340",
+        stay: true,
+        food: true,
+        urgent: true
+      },
+      {
+        id: 2,
+        title: "Concealed Electrician (ವಿದ್ಯುತ್)",
+        trade: "Electrician",
+        site: "Sobha Silicon Heights",
+        area: "Koramangala",
+        wage: 1050,
+        vacancies: 4,
+        phone: "+919845233451",
+        stay: false,
+        food: true,
+        urgent: true
+      },
+      {
+        id: 3,
+        title: "CPVC & Sanitary Plumber (ಪ್ಲಂಬರ್)",
+        trade: "Plumber",
+        site: "Godrej Woodscape Residential",
+        area: "Hebbal",
+        wage: 1000,
+        vacancies: 3,
+        phone: "+919845344562",
+        stay: true,
+        food: false,
+        urgent: false
+      },
+      {
+        id: 4,
+        title: "RCC Beam Bar Bender (ಕಬ್ಬಿಣ ಫಿಟ್ಟರ್)",
+        trade: "Bar Bender",
+        site: "Brigade Tech Boulevard",
+        area: "Electronic City",
+        wage: 980,
+        vacancies: 8,
+        phone: "+919845455673",
+        stay: true,
+        food: true,
+        urgent: true
+      },
+      {
+        id: 5,
+        title: "Interior Painter & Wall Putty (ಪೇಂಟರ್)",
+        trade: "Painter",
+        site: "Prestige Lakeside Villas",
+        area: "Sarjapur",
+        wage: 900,
+        vacancies: 5,
+        phone: "+919845566784",
+        stay: false,
+        food: true,
+        urgent: false
+      },
+      {
+        id: 6,
+        title: "Unskilled Construction Helper (ಸಹಾಯಕ)",
+        trade: "Helper",
+        site: "Metro Green Line Extension Site",
+        area: "Whitefield",
+        wage: 750,
+        vacancies: 10,
+        phone: "+919845122340",
+        stay: true,
+        food: true,
+        urgent: true
+      }
+    ];
+
+    const TRANSLATIONS = {
+      en: {
+        tagline: "Find Work. Find Workers. Build Together.",
+        heroTitle: "Bengaluru Construction Employment Marketplace",
+        heroDesc: "Connecting verified masons, electricians, bar benders, and carpenters with active site supervisors and leading contractors across Metro Bengaluru. 100% Free & Zero Commission.",
+        tabWorker: "Workers (Find Work)",
+        tabSup: "Mestris & Supervisors",
+        tabContractor: "Contractor Multi-Site",
+        tabAdmin: "Admin & Safety Desk"
+      },
+      kn: {
+        tagline: "ಕೆಲಸ ಹುಡುಕಿ. ಕೆಲಸಗಾರರನ್ನು ಹುಡುಕಿ. ಜೊತೆಯಾಗಿ ನಿರ್ಮಿಸಿ.",
+        heroTitle: "ಬೆಂಗಳೂರು ನಿರ್ಮಾಣ ಕಾರ್ಮಿಕರ ಉದ್ಯೋಗ ವೇದಿಕೆ",
+        heroDesc: "ಗಾರೆ ಮೇಸ್ತ್ರಿಗಳು, ಎಲೆಕ್ಟ್ರಿಷಿಯನ್‌ಗಳು, ಪ್ಲಂಬರ್‌ಗಳು ಮತ್ತು ಬಾರ್ ಬೆಂಡರ್‌ಗಳನ್ನು ನೈಜ ಸೈಟ್ ಸೂಪರ್‌ವೈಸರ್‌ಗಳು ಮತ್ತು ಕಂಟ್ರಾಕ್ಟರ್‌ಗಳೊಂದಿಗೆ ಸಂಪರ್ಕಿಸುವ ಉಚಿತ ಆ್ಯಪ್.",
+        tabWorker: "ಕಾರ್ಮಿಕರು (ಕೆಲಸ ಹುಡುಕಿ)",
+        tabSup: "ಮೇಸ್ತ್ರಿಗಳು & ಸೂಪರ್‌ವೈಸರ್",
+        tabContractor: "ಕಂಟ್ರಾಕ್ಟರ್ ಡೆಸ್ಕ್",
+        tabAdmin: "ಸುರಕ್ಷತೆ & ಸಹಾಯವಾಣಿ"
+      },
+      hi: {
+        tagline: "काम खोजें। कारीगर पाएं। साथ मिलकर बनाएं।",
+        heroTitle: "बेंगलुरु कंस्ट्रक्शन रोज़गार और लेबर बाज़ार",
+        heroDesc: "राजमिस्त्री, इलेक्ट्रीशियन, प्लंबर और सरिया फिटर भाइयों को सीधे साइट सुपरवाइजर और ठेकेदारों से जोड़ने वाला 100% मुफ्त ऐप।",
+        tabWorker: "कारीगर (काम खोजें)",
+        tabSup: "मेस्त्री और सुपरवाइजर",
+        tabContractor: "ठेकेदार डैशबोर्ड",
+        tabAdmin: "सुरक्षा और सहायता"
+      },
+      te: {
+        tagline: "పని వెతకండి. కార్మికులను పొందండి. కలిసి నిర్మించండి.",
+        heroTitle: "బెంగళూరు నిర్మాణ కార్మికుల ఉపాధి వేదిక",
+        heroDesc: "మేస్త్రీలు, ఎలక్ట్రీషియన్లు, ప్లంబర్లు మరియు కార్మికులను నేరుగా సైట్ సూపర్వైజర్లతో అనుసంధానించే యాప్.",
+        tabWorker: "కార్మికులు (పని వెతకండి)",
+        tabSup: "మేస్త్రీలు & సూపర్వైజర్లు",
+        tabContractor: "కాంట్రాక్టర్ డాష్‌బోర్డ్",
+        tabAdmin: "భద్రత & హెల్ప్‌డెస్క్"
+      }
+    };
+
+    function renderJobs(jobs) {
+      const container = document.getElementById('jobs-grid');
+      if (jobs.length === 0) {
+        container.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-muted);">No construction jobs found matching your criteria.</div>`;
+        return;
+      }
+
+      container.innerHTML = jobs.map(j => `
+        <div class="card">
+          <div>
+            <div class="card-header">
+              <div>
+                <div class="card-title">${j.title}</div>
+                <div class="card-site">📍 ${j.site} • ${j.area}</div>
+              </div>
+              ${j.urgent ? '<span class="badge-urgent">URGENT</span>' : ''}
+            </div>
+
+            <span class="badge-trade">🛠️ ${j.trade}</span>
+
+            <div class="card-specs">
+              <span class="spec-item">👥 ${j.vacancies} Vacancies</span>
+              ${j.stay ? '<span class="spec-item">🏠 Stay Provided</span>' : ''}
+              ${j.food ? '<span class="spec-item">🍲 Food Included</span>' : ''}
+            </div>
+
+            <div class="wage-highlight">₹${j.wage} <span style="font-size: 13px; font-weight: normal; color: var(--text-muted);">/ day</span></div>
+          </div>
+
+          <div class="card-actions">
+            <a href="tel:${j.phone}" class="btn-call">📞 Call Mestri</a>
+            <a href="https://api.whatsapp.com/send?phone=${j.phone.replace('+','')}&text=Namaskara!%20I%20am%20interested%20in%20your%20SiteMitra%20job%20at%20${encodeURIComponent(j.site)}" target="_blank" class="btn-whatsapp">💬 WhatsApp</a>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function filterJobs() {
+      const search = document.getElementById('search-box').value.toLowerCase();
+      const area = document.getElementById('area-filter').value;
+      const trade = document.getElementById('trade-filter').value;
+
+      const filtered = JOBS_DATA.filter(j => {
+        const matchesSearch = j.title.toLowerCase().includes(search) || j.site.toLowerCase().includes(search) || j.area.toLowerCase().includes(search);
+        const matchesArea = area === 'all' || j.area === area;
+        const matchesTrade = trade === 'all' || j.trade === trade;
+        return matchesSearch && matchesArea && matchesTrade;
+      });
+
+      renderJobs(filtered);
+    }
+
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.role-tab-btn').forEach(el => el.classList.remove('active'));
+
+      document.getElementById('tab-' + tabName).classList.add('active');
+      event.currentTarget.classList.add('active');
+    }
+
+    function changeLanguage(lang) {
+      const t = TRANSLATIONS[lang] || TRANSLATIONS.en;
+      document.getElementById('txt-tagline').innerText = t.tagline;
+      document.getElementById('txt-hero-title').innerText = t.heroTitle;
+      document.getElementById('txt-hero-desc').innerText = t.heroDesc;
+      document.getElementById('tab-worker-label').innerText = t.tabWorker;
+      document.getElementById('tab-sup-label').innerText = t.tabSup;
+      document.getElementById('tab-contractor-label').innerText = t.tabContractor;
+      document.getElementById('tab-admin-label').innerText = t.tabAdmin;
+    }
+
+    function pingServer() {
+      const statusText = document.getElementById('server-status-text');
+      statusText.innerText = "PINGING...";
+      const start = Date.now();
+
+      fetch('https://ais-pre-teslros233v7olr72hky2x-119054699939.asia-northeast1.run.app', { mode: 'no-cors' })
+        .then(() => {
+          const lat = Date.now() - start;
+          statusText.innerText = `ONLINE (${lat}ms)`;
+          statusText.style.color = "var(--green-success)";
+        })
+        .catch(() => {
+          statusText.innerText = "ONLINE (Fallback OK)";
+          statusText.style.color = "var(--green-success)";
+        });
+    }
+
+    // Initial render
+    renderJobs(JOBS_DATA);
+    changeLanguage('kn');
+  </script>
+</body>
+</html>

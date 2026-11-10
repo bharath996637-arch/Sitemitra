@@ -23,6 +23,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.CloudDone
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.filled.Security
@@ -61,6 +62,8 @@ import com.example.R
 import com.example.data.model.Language
 import com.example.data.model.LocaleStrings
 import com.example.data.model.UserRole
+import com.example.data.remote.SiteMitraServerConfig
+import com.example.ui.components.ServerStatusChip
 import com.example.ui.theme.AmberSafety
 import com.example.ui.theme.AmberSafetyContainer
 import com.example.ui.theme.GreenSuccess
@@ -80,6 +83,8 @@ fun MobileLoginScreen(
     val mobileNumber by viewModel.loginMobile.collectAsState()
     val enteredOtp by viewModel.enteredOtp.collectAsState()
     val generatedOtp by viewModel.generatedOtp.collectAsState()
+    val serverIsConnected by viewModel.serverIsConnected.collectAsState()
+    val serverLatencyMs by viewModel.serverLatencyMs.collectAsState()
 
     var newUserName by remember { mutableStateOf("") }
     var newUserSkillOrCompany by remember { mutableStateOf("") }
@@ -98,7 +103,7 @@ fun MobileLoginScreen(
                 .padding(20.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Top Bar: Language Selector & Bengaluru Pilot Badge
+            // Top Bar: Language Selector & Bengaluru Pilot Badge & Google Cloud Server Chip
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -129,28 +134,39 @@ fun MobileLoginScreen(
                     }
                 }
 
-                Surface(
-                    shape = RoundedCornerShape(20.dp),
-                    color = MaterialTheme.colorScheme.surfaceVariant,
-                    modifier = Modifier.clickable { viewModel.setShowLanguagePicker(true) }
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Row(
-                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                    ServerStatusChip(
+                        isConnected = serverIsConnected,
+                        latencyMs = serverLatencyMs,
+                        onClick = { viewModel.setShowServerDialog(true) }
+                    )
+
+                    Surface(
+                        shape = RoundedCornerShape(20.dp),
+                        color = MaterialTheme.colorScheme.surfaceVariant,
+                        modifier = Modifier.clickable { viewModel.setShowLanguagePicker(true) }
                     ) {
-                        Icon(
-                            Icons.Default.Language,
-                            contentDescription = null,
-                            modifier = Modifier.size(16.dp),
-                            tint = NavyPrimary
-                        )
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Text(
-                            text = language.nativeLabel,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 12.sp,
-                            color = NavyPrimary
-                        )
+                        Row(
+                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                Icons.Default.Language,
+                                contentDescription = null,
+                                modifier = Modifier.size(16.dp),
+                                tint = NavyPrimary
+                            )
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text(
+                                text = language.nativeLabel,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 12.sp,
+                                color = NavyPrimary
+                            )
+                        }
                     }
                 }
             }
@@ -194,7 +210,8 @@ fun MobileLoginScreen(
                         language = language,
                         onMobileChanged = { viewModel.setLoginMobile(it) },
                         onSendOtp = { viewModel.sendOtp() },
-                        onQuickLogin = { role -> viewModel.quickLoginAs(role) }
+                        onQuickLogin = { role -> viewModel.quickLoginAs(role) },
+                        onServerDialogClick = { viewModel.setShowServerDialog(true) }
                     )
                 }
 
@@ -262,7 +279,8 @@ private fun EnterPhoneStep(
     language: Language,
     onMobileChanged: (String) -> Unit,
     onSendOtp: () -> Unit,
-    onQuickLogin: (UserRole) -> Unit
+    onQuickLogin: (UserRole) -> Unit,
+    onServerDialogClick: () -> Unit
 ) {
     Card(
         shape = RoundedCornerShape(16.dp),
@@ -304,10 +322,10 @@ private fun EnterPhoneStep(
                         Text(
                             text = "+91",
                             fontWeight = FontWeight.Bold,
-                            fontSize = 15.sp,
+                            fontSize = 14.sp,
                             color = MaterialTheme.colorScheme.onSurface
                         )
-                        Spacer(modifier = Modifier.width(6.dp))
+                        Spacer(modifier = Modifier.width(8.dp))
                         Box(
                             modifier = Modifier
                                 .width(1.dp)
@@ -394,6 +412,51 @@ private fun EnterPhoneStep(
                         fontFamily = FontFamily.Monospace
                     )
                 }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        // Google Cloud Server Connection Badge Card
+        Card(
+            shape = RoundedCornerShape(10.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f)),
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { onServerDialogClick() }
+                .testTag("login_server_card")
+        ) {
+            Row(
+                modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    Icons.Default.CloudDone,
+                    contentDescription = null,
+                    tint = GreenSuccess,
+                    modifier = Modifier.size(18.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = "Connected Google Server",
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = NavyPrimary
+                    )
+                    Text(
+                        text = SiteMitraServerConfig.GOOGLE_SERVER_SHORT_HOST,
+                        fontSize = 10.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 1
+                    )
+                }
+                Text(
+                    text = "Status >",
+                    fontSize = 10.sp,
+                    color = NavyPrimary,
+                    fontWeight = FontWeight.Bold
+                )
             }
         }
     }
