@@ -111,4 +111,23 @@ interface SiteMitraDao {
 
     @Update
     suspend fun updateUser(user: UserEntity)
+
+    // One-shot snapshots for Data Server synchronization
+    @Query("SELECT * FROM users ORDER BY id ASC")
+    suspend fun getAllUsersOnce(): List<UserEntity>
+
+    @Query("SELECT * FROM construction_sites ORDER BY id ASC")
+    suspend fun getAllSitesOnce(): List<ConstructionSiteEntity>
+
+    @Query("SELECT * FROM jobs ORDER BY isUrgent DESC, id DESC")
+    suspend fun getAllJobsOnce(): List<JobEntity>
+
+    @Query("SELECT * FROM applications ORDER BY id DESC")
+    suspend fun getAllApplicationsOnce(): List<ApplicationEntity>
+
+    @Query("SELECT * FROM attendance ORDER BY id DESC")
+    suspend fun getAllAttendanceOnce(): List<AttendanceEntity>
+
+    @Query("SELECT * FROM platform_reports ORDER BY id DESC")
+    suspend fun getAllReportsOnce(): List<PlatformReportEntity>
 }

@@ -61,5 +61,44 @@ class ExampleUnitTest {
         assertEquals("https://ais-pre-teslros233v7olr72hky2x-119054699939.asia-northeast1.run.app", serverUrl)
         assertTrue(serverUrl.startsWith("https://"))
         assertEquals("Google Cloud Run (asia-northeast1)", com.example.data.remote.SiteMitraServerConfig.SERVER_REGION)
+        assertEquals("http://10.0.2.2:3000/", com.example.data.remote.SiteMitraServerConfig.LOCAL_EMULATOR_SERVER_URL)
+    }
+
+    @Test
+    fun testDataServerEntityDtoRoundTrip() {
+        val job = com.example.data.local.entity.JobEntity(
+            id = 42L,
+            siteId = 1L,
+            supervisorId = 2L,
+            title = "Tile Masons Needed",
+            category = "Mason",
+            wagePerDay = 980,
+            vacancies = 4,
+            hiredCount = 1,
+            siteName = "Nalini Towers",
+            siteAddress = "Whitefield",
+            area = "Whitefield",
+            supervisorName = "Mestri Govindappa",
+            supervisorPhone = "+91 98451 22340"
+        )
+        val roundTripped = com.example.data.remote.JobDto(
+            id = job.id,
+            siteId = job.siteId,
+            supervisorId = job.supervisorId,
+            title = job.title,
+            category = job.category,
+            wagePerDay = job.wagePerDay,
+            vacancies = job.vacancies,
+            hiredCount = job.hiredCount,
+            siteName = job.siteName,
+            siteAddress = job.siteAddress,
+            area = job.area,
+            supervisorName = job.supervisorName,
+            supervisorPhone = job.supervisorPhone
+        )
+        assertEquals(job.id, roundTripped.id)
+        assertEquals(job.title, roundTripped.title)
+        assertEquals(job.wagePerDay, roundTripped.wagePerDay)
+        assertEquals(job.siteName, roundTripped.siteName)
     }
 }

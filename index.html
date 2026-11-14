@@ -455,22 +455,23 @@
       <div class="server-info">
         <div class="dot-online" id="server-dot"></div>
         <div>
-          <strong style="font-size: 13px;">Google Cloud Server Gateway:</strong>
-          <span class="server-url">asia-northeast1.run.app</span>
-          <span style="font-size: 11px; color: var(--green-success); font-weight: bold; margin-left: 6px;" id="server-status-text">ONLINE (42ms)</span>
+          <strong style="font-size: 13px;">SiteMitra Data Server:</strong>
+          <span class="server-url" id="server-counts-badge">Syncing...</span>
+          <span style="font-size: 11px; color: var(--green-success); font-weight: bold; margin-left: 6px;" id="server-status-text">CONNECTING...</span>
         </div>
       </div>
-      <div>
-        <button class="btn-ping" onclick="pingServer()">Ping Server</button>
+      <div style="display: flex; gap: 8px;">
+        <button class="btn-ping" onclick="syncFromServer()">Sync Data</button>
+        <button class="btn-ping" style="background: var(--amber-safety);" onclick="pingServer()">Ping Server</button>
       </div>
     </div>
 
     <!-- Role Nav Tabs -->
     <div class="role-tabs">
-      <button class="role-tab-btn active" onclick="switchTab('workers')">👷 <span id="tab-worker-label">Workers (Find Work)</span></button>
-      <button class="role-tab-btn" onclick="switchTab('supervisors')">👷‍♂️ <span id="tab-sup-label">Mestris & Supervisors</span></button>
-      <button class="role-tab-btn" onclick="switchTab('contractors')">🏢 <span id="tab-contractor-label">Contractor Multi-Site</span></button>
-      <button class="role-tab-btn" onclick="switchTab('admin')">🛡️ <span id="tab-admin-label">Admin & Safety Desk</span></button>
+      <button class="role-tab-btn active" onclick="switchTab('workers', this)">👷 <span id="tab-worker-label">Workers (Find Work)</span></button>
+      <button class="role-tab-btn" onclick="switchTab('supervisors', this)">👷‍♂️ <span id="tab-sup-label">Mestris & Supervisors</span></button>
+      <button class="role-tab-btn" onclick="switchTab('contractors', this)">🏢 <span id="tab-contractor-label">Contractor Multi-Site</span></button>
+      <button class="role-tab-btn" onclick="switchTab('admin', this)">🛡️ <span id="tab-admin-label">Admin & Safety Desk</span></button>
     </div>
 
     <!-- TAB 1: WORKERS (FIND WORK) -->
@@ -480,10 +481,11 @@
         <select class="filter-select" id="area-filter" onchange="filterJobs()">
           <option value="all">All Bengaluru Hubs</option>
           <option value="Whitefield">Whitefield</option>
-          <option value="Koramangala">Koramangala</option>
-          <option value="Hebbal">Hebbal</option>
           <option value="Electronic City">Electronic City</option>
-          <option value="Sarjapur">Sarjapur</option>
+          <option value="Bellandur">Bellandur</option>
+          <option value="Varthur">Varthur</option>
+          <option value="Kadugodi">Kadugodi</option>
+          <option value="Hebbal">Hebbal</option>
         </select>
         <select class="filter-select" id="trade-filter" onchange="filterJobs()">
           <option value="all">All Trade Skills</option>
@@ -494,52 +496,46 @@
           <option value="Bar Bender">Bar Bender (ಕಬ್ಬಿಣ)</option>
           <option value="Painter">Painter (ಪೇಂಟರ್)</option>
           <option value="Helper">Helper (ಸಹಾಯಕ)</option>
+          <option value="Welder">Welder (ವೆಲ್ಡರ್)</option>
         </select>
       </div>
 
       <div class="cards-grid" id="jobs-grid">
-        <!-- Rendered dynamically -->
+        <!-- Rendered dynamically from /api/sync -->
       </div>
     </div>
 
     <!-- TAB 2: SUPERVISORS -->
     <div id="tab-supervisors" class="tab-pane">
       <div class="card" style="margin-bottom: 20px;">
-        <h3 style="font-size: 18px; margin-bottom: 10px; color: var(--navy-primary);">Supervisor Quick Job Posting</h3>
-        <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">Publish site requirements instantly to thousands of verified workers across Bengaluru.</p>
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 14px;">
-          <input type="text" class="search-input" placeholder="Project Name (e.g. Prestige Tech Vista)">
-          <input type="text" class="search-input" placeholder="Workers Needed (e.g. 6 Masons)">
-          <input type="text" class="search-input" placeholder="Daily Wage (e.g. ₹950/day)">
+        <h3 style="font-size: 18px; margin-bottom: 10px; color: var(--navy-primary);">Supervisor Quick Job Posting (Live Server Sync)</h3>
+        <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">Publish site requirements to the shared Data Server. Jobs appear immediately in both Web and Android app.</p>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 14px;">
+          <input type="text" id="post-job-title" class="search-input" placeholder="Job Title (e.g. 6 Master Masons)">
+          <input type="text" id="post-site-name" class="search-input" placeholder="Site Name (e.g. Prestige Tech Vista)">
+          <input type="text" id="post-area" class="search-input" placeholder="Area (e.g. Whitefield)">
+          <select id="post-category" class="filter-select">
+            <option value="Mason">Mason</option>
+            <option value="Electrician">Electrician</option>
+            <option value="Plumber">Plumber</option>
+            <option value="Bar Bender">Bar Bender</option>
+            <option value="Carpenter">Carpenter</option>
+            <option value="Painter">Painter</option>
+            <option value="Helper">Helper</option>
+            <option value="Welder">Welder</option>
+          </select>
+          <input type="number" id="post-wage" class="search-input" placeholder="Daily Wage ₹ (e.g. 950)" value="950">
+          <input type="number" id="post-vacancies" class="search-input" placeholder="Vacancies (e.g. 6)" value="6">
         </div>
-        <button class="btn-download" style="width: fit-content; border: none; cursor: pointer;">Post Job Opening</button>
+        <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+          <button class="btn-download" style="width: fit-content; border: none; cursor: pointer;" onclick="postJobToServer()">Post Job to Data Server</button>
+          <span id="post-job-feedback" style="font-size: 13px; font-weight: 600; color: var(--green-success);"></span>
+        </div>
       </div>
 
-      <h3 style="font-size: 18px; margin-bottom: 14px; color: var(--navy-primary);">Today's Muster Roll & Applications</h3>
-      <div class="cards-grid">
-        <div class="card">
-          <div class="card-header">
-            <div>
-              <div class="card-title">Greenfield Tech Park (RCC Stage)</div>
-              <div class="card-site">Whitefield • Supervisor: Govindappa (+91 98451 22340)</div>
-            </div>
-            <span class="badge-urgent">12 Present Today</span>
-          </div>
-          <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px;">8 Masons, 4 Helpers checked in at 08:30 AM. Steel toe boots & hard hats verified.</p>
-          <div class="wage-highlight">Total Today: ₹11,400</div>
-        </div>
-
-        <div class="card">
-          <div class="card-header">
-            <div>
-              <div class="card-title">Sobha Silicon Heights (Finishing)</div>
-              <div class="card-site">Koramangala • Supervisor: Venkat (+91 98452 33451)</div>
-            </div>
-            <span class="badge-urgent">8 Present Today</span>
-          </div>
-          <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px;">4 Tile Masons, 4 Painters checked in at 08:45 AM. Vitrified tiles floor 4.</p>
-          <div class="wage-highlight">Total Today: ₹7,800</div>
-        </div>
+      <h3 style="font-size: 18px; margin-bottom: 14px; color: var(--navy-primary);">Live Applications & Muster Roll</h3>
+      <div class="cards-grid" id="supervisor-grid">
+        <!-- Rendered dynamically from /api/sync -->
       </div>
     </div>
 
@@ -547,41 +543,26 @@
     <div id="tab-contractors" class="tab-pane">
       <div class="card" style="margin-bottom: 20px; background: var(--navy-primary); color: #FFF;">
         <h3 style="font-size: 20px; font-weight: 800; margin-bottom: 4px;">Reddy Infra & Construction Pvt Ltd</h3>
-        <p style="font-size: 13px; color: #94A3B8; margin-bottom: 16px;">Suresh Reddy • Managing 4 Commercial & Residential Sites in Bengaluru</p>
+        <p style="font-size: 13px; color: #94A3B8; margin-bottom: 16px;" id="contractor-summary-subtitle">Suresh Reddy • Connected to Live Data Server</p>
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px;">
           <div>
             <div style="font-size: 12px; color: #94A3B8;">Workforce Required</div>
-            <div style="font-size: 22px; font-weight: 800; color: #FFF;">45 Workers</div>
+            <div style="font-size: 22px; font-weight: 800; color: #FFF;" id="contractor-needed">0 Workers</div>
           </div>
           <div>
             <div style="font-size: 12px; color: #94A3B8;">Active Workers Hired</div>
-            <div style="font-size: 22px; font-weight: 800; color: var(--amber-safety);">38 Workers (84%)</div>
+            <div style="font-size: 22px; font-weight: 800; color: var(--amber-safety);" id="contractor-hired">0 Workers</div>
           </div>
           <div>
-            <div style="font-size: 12px; color: #94A3B8;">Estimated Daily Wages</div>
-            <div style="font-size: 22px; font-weight: 800; color: var(--green-success);">₹34,200 / day</div>
+            <div style="font-size: 12px; color: #94A3B8;">Active Sites</div>
+            <div style="font-size: 22px; font-weight: 800; color: var(--green-success);" id="contractor-sites-count">0 Sites</div>
           </div>
         </div>
       </div>
 
-      <h3 style="font-size: 18px; margin-bottom: 14px; color: var(--navy-primary);">Active Site Portfolios</h3>
-      <div class="cards-grid">
-        <div class="card">
-          <div class="card-title">Prestige Lakeside Habitat (Villas)</div>
-          <div class="card-site">Varthur / Whitefield</div>
-          <div class="card-specs" style="margin-top: 10px;">
-            <span class="spec-item">Civil & Finishing</span>
-            <span class="spec-item">14/15 Workers Hired</span>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-title">Brigade Gateway Extension Phase 2</div>
-          <div class="card-site">Rajajinagar / Yeshwanthpur</div>
-          <div class="card-specs" style="margin-top: 10px;">
-            <span class="spec-item">RCC Framing</span>
-            <span class="spec-item">20/22 Workers Hired</span>
-          </div>
-        </div>
+      <h3 style="font-size: 18px; margin-bottom: 14px; color: var(--navy-primary);">Active Site Portfolios (Live)</h3>
+      <div class="cards-grid" id="sites-grid">
+        <!-- Rendered dynamically from /api/sync -->
       </div>
     </div>
 
@@ -592,17 +573,8 @@
         <p style="font-size: 13px; color: var(--text-muted);">Workers are strictly never charged to find, apply, or work on any construction project. Every wage listing is verified with licensed contractors.</p>
       </div>
 
-      <div class="cards-grid">
-        <div class="card">
-          <div class="card-title">RERA & PPE Safety Compliance</div>
-          <p style="font-size: 13px; color: var(--text-muted); margin: 8px 0;">Mandatory hard hats, reflective jackets, and steel toe shoes provided on all active sites.</p>
-          <div class="badge-trade" style="background: var(--green-bg); color: var(--green-success);">100% Verified Sites</div>
-        </div>
-        <div class="card">
-          <div class="card-title">Worker Grievance & Wage Helpdesk</div>
-          <p style="font-size: 13px; color: var(--text-muted); margin: 8px 0;">24/7 hotline for wage disputes or safety concerns. Immediate contractor escalation.</p>
-          <a href="tel:08040128899" class="btn-call" style="margin-top: 8px; width: fit-content; display: inline-block;">Call Helpdesk (+91 80 4012 8899)</a>
-        </div>
+      <div class="cards-grid" id="reports-grid">
+        <!-- Rendered dynamically from /api/sync -->
       </div>
     </div>
 
@@ -610,90 +582,35 @@
 
   <footer>
     <strong>SiteMitra</strong> – Construction Employment Marketplace &copy; 2026.<br>
-    Built for Android & Web • Serving Workers, Supervisors & Contractors across India.
+    Built for Android & Web • Powered by SiteMitra Live Data Server.
   </footer>
 
   <script>
-    const JOBS_DATA = [
+    const FALLBACK_JOBS = [
       {
         id: 1,
-        title: "Brick Mason (ಗಾರೆ ಮೇಸ್ತ್ರಿ)",
-        trade: "Mason",
-        site: "Greenfield Tech Park (Phase 3)",
+        title: "Urgent: 8 Master Masons for Solid Brick Laying",
+        category: "Mason",
+        siteName: "Nalini Towers Enclave",
         area: "Whitefield",
-        wage: 950,
-        vacancies: 6,
-        phone: "+919845122340",
-        stay: true,
-        food: true,
-        urgent: true
-      },
-      {
-        id: 2,
-        title: "Concealed Electrician (ವಿದ್ಯುತ್)",
-        trade: "Electrician",
-        site: "Sobha Silicon Heights",
-        area: "Koramangala",
-        wage: 1050,
-        vacancies: 4,
-        phone: "+919845233451",
-        stay: false,
-        food: true,
-        urgent: true
-      },
-      {
-        id: 3,
-        title: "CPVC & Sanitary Plumber (ಪ್ಲಂಬರ್)",
-        trade: "Plumber",
-        site: "Godrej Woodscape Residential",
-        area: "Hebbal",
-        wage: 1000,
-        vacancies: 3,
-        phone: "+919845344562",
-        stay: true,
-        food: false,
-        urgent: false
-      },
-      {
-        id: 4,
-        title: "RCC Beam Bar Bender (ಕಬ್ಬಿಣ ಫಿಟ್ಟರ್)",
-        trade: "Bar Bender",
-        site: "Brigade Tech Boulevard",
-        area: "Electronic City",
-        wage: 980,
+        wagePerDay: 950,
         vacancies: 8,
-        phone: "+919845455673",
-        stay: true,
-        food: true,
-        urgent: true
-      },
-      {
-        id: 5,
-        title: "Interior Painter & Wall Putty (ಪೇಂಟರ್)",
-        trade: "Painter",
-        site: "Prestige Lakeside Villas",
-        area: "Sarjapur",
-        wage: 900,
-        vacancies: 5,
-        phone: "+919845566784",
-        stay: false,
-        food: true,
-        urgent: false
-      },
-      {
-        id: 6,
-        title: "Unskilled Construction Helper (ಸಹಾಯಕ)",
-        trade: "Helper",
-        site: "Metro Green Line Extension Site",
-        area: "Whitefield",
-        wage: 750,
-        vacancies: 10,
-        phone: "+919845122340",
-        stay: true,
-        food: true,
-        urgent: true
+        hiredCount: 5,
+        supervisorPhone: "+91 98451 22340",
+        stayProvided: true,
+        foodProvided: true,
+        isUrgent: true
       }
     ];
+
+    let appState = {
+      users: [],
+      sites: [],
+      jobs: FALLBACK_JOBS,
+      applications: [],
+      attendance: [],
+      reports: []
+    };
 
     const TRANSLATIONS = {
       en: {
@@ -736,39 +653,115 @@
 
     function renderJobs(jobs) {
       const container = document.getElementById('jobs-grid');
-      if (jobs.length === 0) {
+      if (!jobs || jobs.length === 0) {
         container.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-muted);">No construction jobs found matching your criteria.</div>`;
         return;
       }
 
-      container.innerHTML = jobs.map(j => `
-        <div class="card">
-          <div>
+      container.innerHTML = jobs.map(j => {
+        const phone = (j.supervisorPhone || '+919845122340').replace(/\s+/g, '');
+        return `
+          <div class="card">
+            <div>
+              <div class="card-header">
+                <div>
+                  <div class="card-title">${j.title}</div>
+                  <div class="card-site">📍 ${j.siteName} • ${j.area}</div>
+                </div>
+                ${j.isUrgent ? '<span class="badge-urgent">URGENT</span>' : ''}
+              </div>
+
+              <span class="badge-trade">🛠️ ${j.category}</span>
+
+              <div class="card-specs">
+                <span class="spec-item">👥 ${j.hiredCount || 0}/${j.vacancies} Hired</span>
+                ${j.stayProvided ? '<span class="spec-item">🏠 Stay Provided</span>' : ''}
+                ${j.foodProvided ? '<span class="spec-item">🍲 Food Included</span>' : ''}
+              </div>
+
+              <div class="wage-highlight">₹${j.wagePerDay} <span style="font-size: 13px; font-weight: normal; color: var(--text-muted);">/ day</span></div>
+            </div>
+
+            <div class="card-actions">
+              <a href="tel:${phone}" class="btn-call">📞 Call</a>
+              <a href="https://api.whatsapp.com/send?phone=${phone.replace('+','')}&text=Namaskara!%20I%20am%20interested%20in%20your%20SiteMitra%20job%20at%20${encodeURIComponent(j.siteName)}" target="_blank" class="btn-whatsapp">💬 WhatsApp</a>
+              <button onclick="applyToJob(${j.id})" class="btn-call" style="background: var(--amber-safety); border: none; cursor: pointer;">Apply</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderSupervisorData() {
+      const container = document.getElementById('supervisor-grid');
+      const items = [
+        ...appState.applications.map(a => `
+          <div class="card">
             <div class="card-header">
               <div>
-                <div class="card-title">${j.title}</div>
-                <div class="card-site">📍 ${j.site} • ${j.area}</div>
+                <div class="card-title">${a.workerName} (${a.workerSkill})</div>
+                <div class="card-site">${a.siteName} • Exp: ${a.workerExperience} yrs</div>
               </div>
-              ${j.urgent ? '<span class="badge-urgent">URGENT</span>' : ''}
+              <span class="badge-urgent" style="background: #EFF6FF; color: #1E40AF;">${a.status}</span>
             </div>
-
-            <span class="badge-trade">🛠️ ${j.trade}</span>
-
-            <div class="card-specs">
-              <span class="spec-item">👥 ${j.vacancies} Vacancies</span>
-              ${j.stay ? '<span class="spec-item">🏠 Stay Provided</span>' : ''}
-              ${j.food ? '<span class="spec-item">🍲 Food Included</span>' : ''}
-            </div>
-
-            <div class="wage-highlight">₹${j.wage} <span style="font-size: 13px; font-weight: normal; color: var(--text-muted);">/ day</span></div>
+            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 10px;">Applied for: ${a.jobTitle}</p>
+            <div class="wage-highlight">₹${a.wagePerDay} / day</div>
           </div>
+        `),
+        ...appState.attendance.map(att => `
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">${att.workerName}</div>
+                <div class="card-site">${att.siteName} • ${att.date}</div>
+              </div>
+              <span class="badge-urgent" style="background: var(--green-bg); color: var(--green-success);">${att.status}</span>
+            </div>
+            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 10px;">${att.notes || 'On site shift'}</p>
+            <div class="wage-highlight">Wage: ₹${att.dailyWage} (Adv: ₹${att.advancePaid})</div>
+          </div>
+        `)
+      ];
+      container.innerHTML = items.length ? items.join('') : '<div class="card">No records yet.</div>';
+    }
 
-          <div class="card-actions">
-            <a href="tel:${j.phone}" class="btn-call">📞 Call Mestri</a>
-            <a href="https://api.whatsapp.com/send?phone=${j.phone.replace('+','')}&text=Namaskara!%20I%20am%20interested%20in%20your%20SiteMitra%20job%20at%20${encodeURIComponent(j.site)}" target="_blank" class="btn-whatsapp">💬 WhatsApp</a>
+    function renderContractorData() {
+      const sites = appState.sites || [];
+      const totalNeeded = sites.reduce((acc, s) => acc + (Number(s.totalWorkersNeeded) || 0), 0);
+      const totalHired = sites.reduce((acc, s) => acc + (Number(s.activeWorkersHired) || 0), 0);
+      const pct = totalNeeded > 0 ? Math.round((totalHired / totalNeeded) * 100) : 0;
+
+      document.getElementById('contractor-needed').innerText = `${totalNeeded} Workers`;
+      document.getElementById('contractor-hired').innerText = `${totalHired} Workers (${pct}%)`;
+      document.getElementById('contractor-sites-count').innerText = `${sites.length} Active Sites`;
+
+      const container = document.getElementById('sites-grid');
+      container.innerHTML = sites.map(s => `
+        <div class="card">
+          <div class="card-title">${s.name}</div>
+          <div class="card-site">${s.developer} • ${s.area}</div>
+          <div class="card-specs" style="margin-top: 10px;">
+            <span class="spec-item">${s.status}</span>
+            <span class="spec-item">${s.activeWorkersHired}/${s.totalWorkersNeeded} Workers Hired</span>
+            <span class="spec-item">Target: ${s.estimatedCompletion}</span>
           </div>
         </div>
       `).join('');
+    }
+
+    function renderAdminReports() {
+      const container = document.getElementById('reports-grid');
+      const cards = (appState.reports || []).map(r => `
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">${r.category}</div>
+            <span class="badge-trade" style="background: var(--green-bg); color: var(--green-success); margin-bottom: 0;">${r.status}</span>
+          </div>
+          <p style="font-size: 13px; color: var(--text-muted); margin: 8px 0;">${r.description}</p>
+          <div style="font-size: 11px; color: var(--text-muted);">Reported by ${r.reportedBy} • ${r.date}</div>
+        </div>
+      `);
+      container.innerHTML = cards.join('');
     }
 
     function filterJobs() {
@@ -776,22 +769,26 @@
       const area = document.getElementById('area-filter').value;
       const trade = document.getElementById('trade-filter').value;
 
-      const filtered = JOBS_DATA.filter(j => {
-        const matchesSearch = j.title.toLowerCase().includes(search) || j.site.toLowerCase().includes(search) || j.area.toLowerCase().includes(search);
+      const filtered = (appState.jobs || []).filter(j => {
+        const matchesSearch =
+          (j.title || '').toLowerCase().includes(search) ||
+          (j.siteName || '').toLowerCase().includes(search) ||
+          (j.area || '').toLowerCase().includes(search) ||
+          (j.category || '').toLowerCase().includes(search);
         const matchesArea = area === 'all' || j.area === area;
-        const matchesTrade = trade === 'all' || j.trade === trade;
+        const matchesTrade = trade === 'all' || j.category === trade;
         return matchesSearch && matchesArea && matchesTrade;
       });
 
       renderJobs(filtered);
     }
 
-    function switchTab(tabName) {
+    function switchTab(tabName, btnEl) {
       document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));
       document.querySelectorAll('.role-tab-btn').forEach(el => el.classList.remove('active'));
 
       document.getElementById('tab-' + tabName).classList.add('active');
-      event.currentTarget.classList.add('active');
+      if (btnEl) btnEl.classList.add('active');
     }
 
     function changeLanguage(lang) {
@@ -805,26 +802,121 @@
       document.getElementById('tab-admin-label').innerText = t.tabAdmin;
     }
 
-    function pingServer() {
+    async function postJobToServer() {
+      const title = document.getElementById('post-job-title').value.trim();
+      const siteName = document.getElementById('post-site-name').value.trim();
+      const area = document.getElementById('post-area').value.trim() || 'Whitefield';
+      const category = document.getElementById('post-category').value;
+      const wagePerDay = Number(document.getElementById('post-wage').value) || 950;
+      const vacancies = Number(document.getElementById('post-vacancies').value) || 5;
+      const feedback = document.getElementById('post-job-feedback');
+
+      if (!title || !siteName) {
+        feedback.style.color = 'var(--red-urgent)';
+        feedback.innerText = 'Please enter both Job Title and Site Name.';
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/jobs', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            title,
+            siteName,
+            area,
+            category,
+            wagePerDay,
+            vacancies,
+            isUrgent: true,
+            foodProvided: true
+          })
+        });
+        if (!res.ok) throw new Error('Server error');
+        document.getElementById('post-job-title').value = '';
+        document.getElementById('post-site-name').value = '';
+        feedback.style.color = 'var(--green-success)';
+        feedback.innerText = 'Job saved to SiteMitra Data Server!';
+        await syncFromServer();
+      } catch (e) {
+        feedback.style.color = 'var(--red-urgent)';
+        feedback.innerText = 'Failed to reach Data Server.';
+      }
+    }
+
+    async function applyToJob(jobId) {
+      const job = appState.jobs.find(j => j.id === jobId);
+      if (!job) return;
+      try {
+        const res = await fetch('/api/applications', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            jobId: job.id,
+            jobTitle: job.title,
+            siteName: job.siteName,
+            wagePerDay: job.wagePerDay,
+            workerId: 1,
+            workerName: 'Web Applicant',
+            workerPhone: '+91 98450 78210',
+            workerSkill: job.category
+          })
+        });
+        if (res.ok) {
+          alert(`Applied to ${job.siteName}! Saved on SiteMitra Data Server.`);
+          await syncFromServer();
+        }
+      } catch (e) {
+        alert('Could not submit application right now.');
+      }
+    }
+
+    async function pingServer() {
       const statusText = document.getElementById('server-status-text');
+      const countsBadge = document.getElementById('server-counts-badge');
       statusText.innerText = "PINGING...";
       const start = Date.now();
 
-      fetch('https://ais-pre-teslros233v7olr72hky2x-119054699939.asia-northeast1.run.app', { mode: 'no-cors' })
-        .then(() => {
-          const lat = Date.now() - start;
+      try {
+        const res = await fetch('/api/health');
+        const lat = Date.now() - start;
+        if (res.ok) {
+          const data = await res.json();
           statusText.innerText = `ONLINE (${lat}ms)`;
           statusText.style.color = "var(--green-success)";
-        })
-        .catch(() => {
-          statusText.innerText = "ONLINE (Fallback OK)";
-          statusText.style.color = "var(--green-success)";
-        });
+          countsBadge.innerText = `${data.counts.sites} Sites • ${data.counts.jobs} Jobs • ${data.counts.users} Users`;
+        } else {
+          throw new Error('HTTP ' + res.status);
+        }
+      } catch (e) {
+        statusText.innerText = "OFFLINE (Local Cache)";
+        statusText.style.color = "var(--amber-safety)";
+      }
     }
 
-    // Initial render
-    renderJobs(JOBS_DATA);
+    async function syncFromServer() {
+      try {
+        const res = await fetch('/api/sync');
+        if (!res.ok) throw new Error('Sync failed');
+        const data = await res.json();
+        appState = data;
+        filterJobs();
+        renderSupervisorData();
+        renderContractorData();
+        renderAdminReports();
+        await pingServer();
+      } catch (e) {
+        filterJobs();
+        renderSupervisorData();
+        renderContractorData();
+        renderAdminReports();
+        await pingServer();
+      }
+    }
+
+    // Initial load from live Data Server
     changeLanguage('kn');
+    syncFromServer();
   </script>
 </body>
 </html>

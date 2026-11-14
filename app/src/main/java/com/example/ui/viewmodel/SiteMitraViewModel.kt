@@ -49,12 +49,9 @@ enum class LoginStep {
 
 class SiteMitraViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val repository: SiteMitraRepository
-
-    init {
-        val db = SiteMitraDatabase.getInstance(application)
-        repository = SiteMitraRepository(db.dao())
-    }
+    private val repository: SiteMitraRepository = SiteMitraRepository(
+        SiteMitraDatabase.getInstance(application).dao()
+    )
 
     // Authentication & First-Screen Mobile Login State
     private val _isLoggedIn = MutableStateFlow(false)
@@ -263,6 +260,10 @@ class SiteMitraViewModel(application: Application) : AndroidViewModel(applicatio
             matchesQuery && matchesSkill && matchesDistance && matchesWage && matchesFood && matchesStay
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    init {
+        syncWithGoogleServer(silent = true)
+    }
 
     // Role, Language & Navigation Setters
     fun setRole(role: UserRole) {
@@ -591,16 +592,34 @@ class SiteMitraViewModel(application: Application) : AndroidViewModel(applicatio
         }
     }
 
-    fun syncWithGoogleServer() {
+    fun syncWithGoogleServer(silent: Boolean = false) {
         viewModelScope.launch {
             _isPingingServer.value = true
-            kotlinx.coroutines.delay(400) // Brief network simulate/roundtrip check
-            val result = SiteMitraServerConfig.pingGoogleServer()
-            _serverIsConnected.value = result.isSuccess
-            _serverLatencyMs.value = result.latencyMs
+            val syncResult = repository.syncWithServer()
+            val timestamp = java.text.SimpleDateFormat("HH:mm:ss", java.util.Locale.getDefault()).format(java.util.Date())
+            syncResult.onSuccess { summary ->
+                _serverIsConnected.value = true
+                _serverLatencyMs.value = summary.latencyMs
+                val hostLabel = if (summary.endpointUrl == SiteMitraServerConfig.LOCAL_EMULATOR_SERVER_URL) {
+                    "10.0.2.2:3000"
+                } else {
+                    SiteMitraServerConfig.GOOGLE_SERVER_SHORT_HOST
+                }
+                _serverStatusMessage.value = "Synced ${summary.jobsCount} jobs & ${summary.applicationsCount} apps ($hostLabel)"
+                _lastSyncTime.value = "Synced at $timestamp"
+                if (!silent) {
+                    _userMessage.value = "Synced ${summary.jobsCount} jobs & ${summary.sitesCount} sites with Data Server"
+                }
+            }.onFailure { err ->
+                val pingResult = SiteMitraServerConfig.pingGoogleServer()
+                _serverIsConnected.value = pingResult.isSuccess
+                _serverLatencyMs.value = pingResult.latencyMs
+                _serverStatusMessage.value = pingResult.message
+                if (!silent) {
+                    _userMessage.value = "Sync offline (using local database): ${err.localizedMessage ?: "Network unavailable"}"
+                }
+            }
             _isPingingServer.value = false
-            _lastSyncTime.value = "Synced at " + java.text.SimpleDateFormat("HH:mm:ss", java.util.Locale.getDefault()).format(java.util.Date())
-            _userMessage.value = "Synchronized with Google Server (${SiteMitraServerConfig.GOOGLE_SERVER_SHORT_HOST})"
         }
     }
 }
